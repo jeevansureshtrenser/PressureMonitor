@@ -27,7 +27,7 @@
 #define DEF_CLEAR                   0
 #define DEF_SET                     1
 #define MSG_SIZE                    64
-#define CALIB_CONST                 0
+#define CALIB_CONST                 5
 
 #define ONE_MILLS_IN_SEC            1000
 

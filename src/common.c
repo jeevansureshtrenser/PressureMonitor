@@ -81,16 +81,16 @@ void PrintMessage(ERROR_TYPE errortype_t, int iReadVal)
     switch(errortype_t)
     {
         case NO_ERROR: 
-                        printf("|  %6ld.%06ld | DEBUG   | %d | NORMAL |\n",current_time_sec, current_milliseconds, iReadVal);
+                        printf("|  %6ld.%06ld | DEBUG   | %3d | NORMAL |\n",current_time_sec, current_milliseconds, iReadVal);
             break;
         case ERROR_INVALID:
-                        printf("|  %6ld.%06ld | INVALID | %d | Out of Bounds |\n",current_time_sec, current_milliseconds, iReadVal);
+                        printf("|  %6ld.%06ld | INVALID | %3d | Out of Bounds |\n",current_time_sec, current_milliseconds, iReadVal);
             break;
         case ERROR_THRESHOLD_MIN:
-                        printf("| %6ld.%06ld | WARNING  | %d | Below Min Threshold |\n", current_time_sec, current_milliseconds, iReadVal);
+                        printf("|  %6ld.%06ld | WARNING | %3d | Below Min Threshold |\n", current_time_sec, current_milliseconds, iReadVal);
             break;
         case ERROR_THRESHOLD_MAX:
-                        printf("| %6ld.%06ld | WARNING  | %d | Above Max Threshold |\n", current_time_sec, current_milliseconds, iReadVal);
+                        printf("|  %6ld.%06ld | WARNING | %3d | Above Max Threshold |\n", current_time_sec, current_milliseconds, iReadVal);
             break;
         default:
             break;

@@ -1,3 +1,0 @@
-/home/jeevan/PressureMonitor/Source/build/CMakeFiles/pressuremonitor.dir
-/home/jeevan/PressureMonitor/Source/build/CMakeFiles/edit_cache.dir
-/home/jeevan/PressureMonitor/Source/build/CMakeFiles/rebuild_cache.dir
