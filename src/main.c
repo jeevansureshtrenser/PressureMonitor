@@ -44,7 +44,7 @@ void BackgroundProcess(void)
             case NORMAL_STATE:
                 if(ProcessData(&g_stPressureConfig) != NO_ERROR)
                 {
-                    printf("Error Processing, switching to ERROR_STATE\n");
+                    printf("\nError Processing, switching to ERROR_STATE\n");
                     g_eSystemState = ERROR_STATE;
                 }
                 else
@@ -56,11 +56,12 @@ void BackgroundProcess(void)
                 // Handle error state
                 if(FaultHandler(&g_stPressureConfig) != NO_ERROR)
                 {
-                    printf("Error Fault Handling, switching to SAFE_STATE\n");
+                    printf("\nError Fault Handling, switching to SAFE_STATE\n");
                     g_eSystemState = SAFE_STATE;
                 }
                 else
                 {
+                    printf("\nRead Value normal, switching to NORMAL_STATE\n");
                     g_eSystemState = NORMAL_STATE;
                 }
                 break;
@@ -89,6 +90,15 @@ int main(int argc, char *argv[])
 {
     // Initialize global variables
     g_lStart_reference = clock();
+    if(g_lStart_reference == DEF_CLEAR)
+    {
+        printf("Error initializing time reference\n");
+        return FAILURE;
+    }
+    else
+    {
+        /* No Process*/
+    }
 
     // Read configuration parameters
     if(ReadConfigParams(&g_stPressureConfig) != NO_ERROR)

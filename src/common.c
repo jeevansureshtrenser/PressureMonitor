@@ -26,7 +26,8 @@
 //******************************* Local Constants ******************************
 
 //******************************* Local Variables ******************************
-PRESSURE_CONFIG g_stPressureConfig = {  "vr.01",
+PRESSURE_CONFIG g_stPressureConfig = {  
+                                        "vr.01",
                                         DEFAULT_MIN_THRESHOLD,
                                         DEFAULT_MAX_THRESHOLD,
                                         DEFAULT_MIN_OPERATING_RANGE,
@@ -280,6 +281,7 @@ ERROR_TYPE ProcessData(PRESSURE_CONFIG *pstPressureConfig)
     }
     else
     {
+        PrintMessage(ERROR_INVALID, iReadVal);
         return ERROR_INVALID;
     }
 
@@ -315,7 +317,8 @@ ERROR_TYPE FaultHandler(PRESSURE_CONFIG *pstPressureConfig)
 
         if(CheckOperatingRange(pstPressureConfig, iReadVal) == NO_ERROR)
         {
-            return NO_ERROR;
+            PrintMessage(NO_ERROR, iReadVal);
+            //return NO_ERROR;
         }
         else
         {
@@ -359,7 +362,7 @@ ERROR_TYPE SafeProcessing(void)
         printf("Invalid Choice. Staying in SAFE STATE.\n");
     }
 
-    sleep(ONE_MILLS_IN_SEC); // Simulate safe processing delay
+    usleep(ONE_MILLS_IN_SEC); // Simulate safe processing delay
     return NO_ERROR;
 }
 
