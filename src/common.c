@@ -1,11 +1,17 @@
-/************************************************************
-* File name     : common.c
-* Description   : common file for project
-* Author        : Jeevan Suresh
-* License       : Copyright (c) 2025 Trenser 
-                    All Rights Reserved
-**************************************************************/
-/**********************Include Files**************************/
+//******************************* PRESSURE MONITOR *****************************
+//  Copyright (c) 2026 Trenser Technologies Pvt Ltd.
+//  All Rights Reserved 
+//******************************************************************************
+// 
+// File     : common.c
+// Summary  : Common functions for Pressure Monitor Application
+// Note     : This file is part of Pressure Monitor Application.
+// Author   : Jeevan Suresh
+// Date     : 2026-06-15
+// 
+//******************************************************************************
+ 
+//******************************* Include Files ********************************
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
@@ -15,7 +21,11 @@
 #include "common.h"
 #include "pressure_sensor.h"
 
-/*********************Global Variable Declaration***************/
+//******************************* Local Types **********************************
+
+//******************************* Local Constants ******************************
+
+//******************************* Local Variables ******************************
 PRESSURE_CONFIG g_stPressureConfig = {  "vr.01",
                                         DEFAULT_MIN_THRESHOLD,
                                         DEFAULT_MAX_THRESHOLD,
@@ -28,7 +38,8 @@ PRESSURE_CONFIG g_stPressureConfig = {  "vr.01",
 
 STATE_TYPE g_eSystemState = NORMAL_STATE;
 clock_t g_lStart_reference = DEF_CLEAR;
-//*********************Function Declarations********************/
+
+//******************************* Local Functions ******************************
 void PrintConfig(PRESSURE_CONFIG *stPressureConfig);
 void PrintMessage(ERROR_TYPE errortype_t, int iReadVal);
 ERROR_TYPE ReadConfigParams(PRESSURE_CONFIG *pstPressureConfig);
@@ -39,29 +50,44 @@ ERROR_TYPE ProcessData(PRESSURE_CONFIG *pstPressureConfig);
 ERROR_TYPE FaultHandler(PRESSURE_CONFIG *pstPressureConfig);
 ERROR_TYPE SafeProcessing(void);
 
-//*********************Function Definitions*********************/
+//******************************* PrintConfig **********************************
+//Purpose : To print the configuration parameters
+//Inputs  : PRESSURE_CONFIG *stPressureConfig - pointer to pressure
+//          configuration structure
+//Outputs : None
+//Return  : void
+//Notes   : print the configuration parameters
+//******************************************************************************
 void PrintConfig(PRESSURE_CONFIG *stPressureConfig)
 {
-    printf("Configuration Parameters:\n");
-    printf("CONFIGVERSION: %s\n", stPressureConfig->CONFIGVERSION);
-    printf("Lower Threshold Range: %d\n", stPressureConfig->iLowerThresholdRange);
-    printf("Upper Threshold Range: %d\n", stPressureConfig->iUpperThresholdRange);
-    printf("Lower Operating Range: %d\n", stPressureConfig->iLowerOperatingRange);
-    printf("Upper Operating Range: %d\n", stPressureConfig->iUpperOperatingRange);
-    printf("Check Time: %ld\n", stPressureConfig->liChecktime);
-    printf("Retry Timeout: %ld\n", stPressureConfig->liRetrytimeout);
-    printf("Max Try Count: %d\n", stPressureConfig->iMaxTryCount);
+    if(stPressureConfig == NULL)
+    {
+        return;
+    }
+    else
+    {
+        /* No Process*/
+    }
+    printf("****************** CONFIGURATION PARAMETERS *******************\n");
+    printf("Configuration Version   : %s\n", stPressureConfig->CONFIGVERSION);
+    printf("Lower Threshold Range   : %d\n", stPressureConfig->iLowerThresholdRange);
+    printf("Upper Threshold Range   : %d\n", stPressureConfig->iUpperThresholdRange);
+    printf("Lower Operating Range   : %d\n", stPressureConfig->iLowerOperatingRange);
+    printf("Upper Operating Range   : %d\n", stPressureConfig->iUpperOperatingRange);
+    printf("Check Time              : %ld\n", stPressureConfig->liChecktime);
+    printf("Retry Timeout           : %ld\n", stPressureConfig->liRetrytimeout);
+    printf("Max Try Count           : %d\n", stPressureConfig->iMaxTryCount);
+    printf("***************************************************************\n");
 }
-/**********************************************************************
-* Function name     : PrintMessage
-* Description       : to print the message based on the parameter type
-* Arguments         : WarningType warningType_t - to detect type of 
-*                        warning, debug or invalid
-*                     Parameter_type param_t - to detect the parameter 
-*                        temperature or pressure
-*                      int iReadVal - read data
-* Return type       : void
-*************************************************************************/
+
+//******************************* PrintMessage *********************************
+//Purpose : To print the message based on the parameter type
+//Inputs  : ERROR_TYPE errortype_t - error type
+//          int iReadVal - read data
+//Outputs : None
+//Return  : void
+//Notes   : None
+//******************************************************************************
 void PrintMessage(ERROR_TYPE errortype_t, int iReadVal)
 {
     clock_t current_time                = DEF_CLEAR;
@@ -76,21 +102,22 @@ void PrintMessage(ERROR_TYPE errortype_t, int iReadVal)
     }
     elapsed = (double)(current_time - g_lStart_reference) / CLOCKS_PER_SEC;
     current_time_sec = (int)elapsed;
-    current_milliseconds = (int)((elapsed - current_time_sec) * ONE_MILLS_IN_SEC);
+    current_milliseconds = (int)(elapsed - current_time_sec);
+    current_milliseconds = (int)current_milliseconds * ONE_MILLS_IN_SEC;
 
     switch(errortype_t)
     {
         case NO_ERROR: 
-                        printf("|  %6ld.%06ld | DEBUG   | %3d | NORMAL |\n",current_time_sec, current_milliseconds, iReadVal);
+                        printf("|  %6ld.%06ld | DEBUG   | %3d PSI | NORMAL |\n",current_time_sec, current_milliseconds, iReadVal);
             break;
         case ERROR_INVALID:
-                        printf("|  %6ld.%06ld | INVALID | %3d | Out of Bounds |\n",current_time_sec, current_milliseconds, iReadVal);
+                        printf("|  %6ld.%06ld | INVALID | %3d PSI | Out of Bounds |\n",current_time_sec, current_milliseconds, iReadVal);
             break;
         case ERROR_THRESHOLD_MIN:
-                        printf("|  %6ld.%06ld | WARNING | %3d | Below Min Threshold |\n", current_time_sec, current_milliseconds, iReadVal);
+                        printf("|  %6ld.%06ld | WARNING | %3d PSI | Below Min Threshold |\n", current_time_sec, current_milliseconds, iReadVal);
             break;
         case ERROR_THRESHOLD_MAX:
-                        printf("|  %6ld.%06ld | WARNING | %3d | Above Max Threshold |\n", current_time_sec, current_milliseconds, iReadVal);
+                        printf("|  %6ld.%06ld | WARNING | %3d PSI | Above Max Threshold |\n", current_time_sec, current_milliseconds, iReadVal);
             break;
         default:
             break;
@@ -98,19 +125,23 @@ void PrintMessage(ERROR_TYPE errortype_t, int iReadVal)
 
 }
 
-/**********************************************************************
-* Function name     : ReadConfigParams
-* Description       : to read configuration parameters
-* Arguments         : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure configuration structure
-*                      int iReadVal - read data
-* Return type       : void
-*************************************************************************/
+//******************************* ReadConfigParams *****************************
+//Purpose : To read configuration parameters
+//Inputs  : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure
+//          configuration structure
+//Outputs : Pointer to pressure configuration structure is updated
+//Return  : ERROR_TYPE
+//Notes   : None
+//******************************************************************************
 ERROR_TYPE ReadConfigParams(PRESSURE_CONFIG *pstPressureConfig)
 {
-    pstPressureConfig = (PRESSURE_CONFIG *)malloc(sizeof(PRESSURE_CONFIG));
     if(pstPressureConfig == NULL)
     {
         return ERROR_INVALID;
+    }
+    else
+    {
+        /* No Process*/
     }
     pstPressureConfig->CONFIGVERSION        = "v1.0";
     pstPressureConfig->iLowerThresholdRange = DEFAULT_MIN_THRESHOLD;
@@ -124,12 +155,13 @@ ERROR_TYPE ReadConfigParams(PRESSURE_CONFIG *pstPressureConfig)
     return NO_ERROR;
 }
 
-/**********************************************************************
-* Function name     : CheckPollTime
-* Description       : to check the polling time
-* Arguments         : long int lCheckTime - polling time
-* Return type       : ERROR_TYPE
-*************************************************************************/
+//******************************* CheckPollTime ********************************
+//Purpose : To check the polling time
+//Inputs  : long int lCheckTime - polling time
+//Outputs : None
+//Return  : ERROR_TYPE
+//Notes   : None
+//******************************************************************************
 ERROR_TYPE CheckPollTime(long int lCheckTime)    
 {
     static long int lPreviousCheckTime = DEF_CLEAR;
@@ -162,13 +194,15 @@ ERROR_TYPE CheckPollTime(long int lCheckTime)
     return NO_ERROR;
 }
 
-/**********************************************************************
-* Function name     : CheckOperatingRange
-* Description       : to check the operating range
-* Arguments         : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure configuration structure
-*                     float fReadVal - read data
-* Return type       : ERROR_TYPE
-*************************************************************************/
+//******************************* CheckOperatingRange **************************
+//Purpose : To check the operating range
+//Inputs  : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure
+//          configuration structure
+//          int iReadVal - read data
+//Outputs : None
+//Return  : ERROR_TYPE
+//Notes   : None
+//******************************************************************************
 ERROR_TYPE CheckOperatingRange(PRESSURE_CONFIG *pstPressureConfig,int iReadVal)
 {
     if(iReadVal < pstPressureConfig->iLowerOperatingRange ||
@@ -183,13 +217,15 @@ ERROR_TYPE CheckOperatingRange(PRESSURE_CONFIG *pstPressureConfig,int iReadVal)
     return NO_ERROR;
 }
 
-/**********************************************************************
-* Function name     : CheckThresholdRange
-* Description       : to check the threshold range
-* Arguments         : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure configuration structure
-*                     float fReadVal - read data
-* Return type       : ERROR_TYPE
-*************************************************************************/
+//******************************* CheckThresholdRange **************************
+//Purpose : To check the threshold range
+//Inputs  : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure
+//          configuration structure
+//          int iReadVal - read data
+//Outputs : None
+//Return  : ERROR_TYPE
+//Notes   : None
+//******************************************************************************
 ERROR_TYPE CheckThresholdRange(PRESSURE_CONFIG *pstPressureConfig,int iReadVal)
 {
     if(iReadVal < pstPressureConfig->iLowerThresholdRange)
@@ -207,12 +243,14 @@ ERROR_TYPE CheckThresholdRange(PRESSURE_CONFIG *pstPressureConfig,int iReadVal)
     return NO_ERROR;
 }
 
-/**********************************************************************
-* Function name     : ProcessData
-* Description       : to process the data based on the parameter type
-* Arguments         : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure configuration structure
-* Return type       : ERROR_TYPE
-*************************************************************************/
+//******************************* ProcessData **********************************
+//Purpose : To process the data based on the parameter type
+//Inputs  : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure
+//          configuration structure
+//Outputs : None
+//Return  : ERROR_TYPE
+//Notes   : None
+//******************************************************************************
 ERROR_TYPE ProcessData(PRESSURE_CONFIG *pstPressureConfig)
 {
     int iReadVal = DEF_CLEAR;
@@ -248,12 +286,14 @@ ERROR_TYPE ProcessData(PRESSURE_CONFIG *pstPressureConfig)
     return NO_ERROR;
 }
 
-/**********************************************************************
-* Function name     : FaultHandler
-* Description       : to handle the fault based on the parameter type
-* Arguments         : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure configuration structure
-* Return type       : ERROR_TYPE
-*************************************************************************/
+//******************************* FaultHandler *********************************
+//Purpose : To handle the fault based on the parameter type
+//Inputs  : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure
+//          configuration structure
+//Outputs : None
+//Return  : ERROR_TYPE
+//Notes   : None
+//******************************************************************************
 ERROR_TYPE FaultHandler(PRESSURE_CONFIG *pstPressureConfig)
 {
     int iTryCount = DEF_CLEAR;
@@ -265,6 +305,7 @@ ERROR_TYPE FaultHandler(PRESSURE_CONFIG *pstPressureConfig)
         eRetVal = ReadPressure(&iReadVal);
         if(eRetVal != NO_ERROR)
         {
+            PrintMessage(ERROR_INVALID, iReadVal);
             continue;
         }
         else
@@ -274,31 +315,51 @@ ERROR_TYPE FaultHandler(PRESSURE_CONFIG *pstPressureConfig)
 
         if(CheckOperatingRange(pstPressureConfig, iReadVal) == NO_ERROR)
         {
-            printf("Fault Resolved in Attempt: %d\n", iTryCount + 1);
             return NO_ERROR;
         }
         else
         {
             continue;
         }
-        printf("Retrying to read the pressure value, Attempt: %d\n", iTryCount + 1);
         usleep(pstPressureConfig->liRetrytimeout);
         
     }
     return ERROR_INVALID;
 }
 
-/**********************************************************************
-* Function name     : SafeProcessing
-* Description       : to print   the message based on the parameter type
-* Arguments         : PRESSURE_CONFIG *pstPressureConfig - pointer to pressure configuration structure
-*                     float fReadVal - read data
-* Return type       : ERROR_TYPE
-*************************************************************************/
+//******************************* SafeProcessing *******************************
+//Purpose : After reaching safe state, to handle the safe processing
+//Inputs  : void
+//Outputs : None
+//Return  : ERROR_TYPE
+//Notes   : None
+//******************************************************************************
 ERROR_TYPE SafeProcessing(void)
 {
     printf("System is in SAFE STATE. Taking necessary actions.\n");
-    sleep(5); // Simulate safe processing delay
+    printf("Waiting For User Intervention...\n");
+    printf("Choose Option to Recover System:\n1. Reset System\n2. Shutdown System\n");
+    char choice = getchar();
+    if(choice == OPTION_ONE)
+    {
+        printf("System Reset Initiated...\n");
+        g_eSystemState = NORMAL_STATE;
+    }
+    else if(choice == OPTION_TWO)
+    {
+        printf("System Shutdown Initiated...\n");
+        exit(SUCCESS);
+    }
+    else if(choice == NEWLINE_CHAR)
+    {
+        // Ignore newline character
+    }
+    else
+    {
+        printf("Invalid Choice. Staying in SAFE STATE.\n");
+    }
+
+    sleep(ONE_MILLS_IN_SEC); // Simulate safe processing delay
     return NO_ERROR;
 }
 

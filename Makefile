@@ -1,7 +1,11 @@
-#************************************************************
-# Author 	: Jeevan Suresh
-# License   : 
-#**************************************************************
+#*******************************************************************************
+# File      	: Makefile
+# Description 	: Makefile for Pressure Monitor Application
+# Author 		: Jeevan Suresh
+# License   	: Copyright (c) 2026 Trenser 
+#                    All Rights Reserved
+#*******************************************************************************
+
 # Compiler
 CC = gcc
 

@@ -1,12 +1,17 @@
-/************************************************************
-* File name     : main.c
-* Description   : This file is the entry point to the system
-* Author        : Jeevan Suresh
-* License       : Copyright (c) 2025 Trenser 
-                    All Rights Reserved
-**************************************************************/
-
-/******************************Include Files******************************/
+//******************************* PRESSURE MONITOR *****************************
+//  Copyright (c) 2026 Trenser Technologies Pvt Ltd.
+//  All Rights Reserved 
+//******************************************************************************
+// 
+// File     : main.c
+// Summary  : Main functions for Pressure Monitor Application
+// Note     : This file is part of Pressure Monitor Application.
+// Author   : Jeevan Suresh
+// Date     : 2026-06-15
+// 
+//******************************************************************************
+ 
+//******************************* Include Files ********************************
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -14,13 +19,22 @@
 #include "common.h"
 #include "pressure_sensor.h"
 #include <unistd.h>
-/******************************Function Definitions******************************/
-/************************************************************
-* File name     : BackgroundProcess
-* Description   : to handle the background processing based on system state
-* argument      : void
-* Return        : int
-**************************************************************/
+
+//******************************* Local Types **********************************
+
+//******************************* Local Constants ******************************
+
+//******************************* Local Variables ******************************
+
+//******************************* Local Functions ******************************
+
+//******************************* BackgroundProcess ****************************
+//Purpose : the background process handling different states
+//Inputs  : void
+//Outputs : None
+//Return  : void
+//Notes   : Idle loop for background processing
+//******************************************************************************
 void BackgroundProcess(void)
 {
     while(1)
@@ -30,19 +44,19 @@ void BackgroundProcess(void)
             case NORMAL_STATE:
                 if(ProcessData(&g_stPressureConfig) != NO_ERROR)
                 {
-                    printf("Error in processing data, switching to ERROR_STATE\n");
+                    printf("Error Processing, switching to ERROR_STATE\n");
                     g_eSystemState = ERROR_STATE;
                 }
                 else
                 {
-                    sleep(g_stPressureConfig.liChecktime); // converting to micro seconds
+                    sleep(g_stPressureConfig.liChecktime);
                 }
                 break;
             case ERROR_STATE:
                 // Handle error state
                 if(FaultHandler(&g_stPressureConfig) != NO_ERROR)
                 {
-                    printf("Error could not be resolved, switching to SAFE_STATE\n");
+                    printf("Error Fault Handling, switching to SAFE_STATE\n");
                     g_eSystemState = SAFE_STATE;
                 }
                 else
@@ -62,16 +76,21 @@ void BackgroundProcess(void)
         
     }
 }
-/************************************************************
-* File name     : main
-* Description   : entry point of the application
-* argument      : void
-* Return        : int
-**************************************************************/
+
+//******************************* main **********************************
+//Purpose : To print the configuration parameters
+//Inputs  : PRESSURE_CONFIG *stPressureConfig - pointer to pressure
+//          configuration structure
+//Outputs : None
+//Return  : void
+//Notes   : print the configuration parameters
+//******************************************************************************
 int main(int argc, char *argv[])
 {
+    // Initialize global variables
     g_lStart_reference = clock();
-    printf("Read the application\n");
+
+    // Read configuration parameters
     if(ReadConfigParams(&g_stPressureConfig) != NO_ERROR)
     {
         printf("Error in reading configuration parameters\n");
@@ -82,12 +101,11 @@ int main(int argc, char *argv[])
         PrintConfig(&g_stPressureConfig);
         g_eSystemState = NORMAL_STATE;
     }
-    printf("start the application\n");
+
+    // Start background processing
     BackgroundProcess();
     printf("Exiting the application\n");
     return SUCCESS;
 }
 
-
 /* end of file*/
-
