@@ -23,7 +23,7 @@
 //******************************* Local Variables ******************************
 
 //******************************* Local Functions ******************************
-ERROR_TYPE ReadPressure(int *);
+ERROR_TYPE ReadPressure(int *, PRESSURE_CONFIG *);
 
 //******************************* ReadPressure ****************************
 //Purpose : Read pressure value from sensor
@@ -32,20 +32,23 @@ ERROR_TYPE ReadPressure(int *);
 //Return  : ERROR_TYPE
 //Notes   : read pressure value from sensor
 //******************************************************************************
-ERROR_TYPE ReadPressure(int *aiReadval)
+ERROR_TYPE ReadPressure(int *aiReadval, PRESSURE_CONFIG *pstPressureConfig)
 {
-    int max = DEFAULT_MAX_OPERATING_RANGE + CALIB_CONST;
-    int min = DEFAULT_MIN_OPERATING_RANGE - CALIB_CONST;
+    int max = pstPressureConfig->iUpperOperatingRange + CALIB_CONST;
+    int min = pstPressureConfig->iLowerOperatingRange - CALIB_CONST;
+    ERROR_TYPE eRetVal = NO_ERROR;
+
     *aiReadval = ((rand() % (max - min + 1)) + min);
+
     if(aiReadval == DEF_CLEAR)
     {
-        return ERROR_INVALID;
+        eRetVal = ERROR_INVALID;
     }
     else
     { 
         /* No Process*/ 
     }
-    return NO_ERROR;
+    return eRetVal;
 }
 
 /* end of file*/

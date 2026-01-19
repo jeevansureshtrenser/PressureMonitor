@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     if(g_lStart_reference == DEF_CLEAR)
     {
         printf("Error initializing time reference\n");
-        return FAILURE;
+        exit(FAILURE);
     }
     else
     {
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     if(ReadConfigParams(&g_stPressureConfig) != NO_ERROR)
     {
         printf("Error in reading configuration parameters\n");
-        return FAILURE;
+        exit(FAILURE);
     }
     else
     {

@@ -136,9 +136,11 @@ void PrintMessage(ERROR_TYPE errortype_t, int iReadVal)
 //******************************************************************************
 ERROR_TYPE ReadConfigParams(PRESSURE_CONFIG *pstPressureConfig)
 {
+    ERROR_TYPE eRetVal = NO_ERROR;
+
     if(pstPressureConfig == NULL)
     {
-        return ERROR_INVALID;
+        eRetVal = ERROR_INVALID;
     }
     else
     {
@@ -153,7 +155,7 @@ ERROR_TYPE ReadConfigParams(PRESSURE_CONFIG *pstPressureConfig)
     pstPressureConfig->liRetrytimeout       = DEFAULT_RETRY_TIME_OUT;
     pstPressureConfig->iMaxTryCount         = MAX_RETRY_COUNT;
 
-    return NO_ERROR;
+    return eRetVal;
 }
 
 //******************************* CheckPollTime ********************************
@@ -165,13 +167,15 @@ ERROR_TYPE ReadConfigParams(PRESSURE_CONFIG *pstPressureConfig)
 //******************************************************************************
 ERROR_TYPE CheckPollTime(long int lCheckTime)    
 {
-    static long int lPreviousCheckTime = DEF_CLEAR;
-    long int lCurrentTime = DEF_CLEAR;
+    static long int lPreviousCheckTime  = DEF_CLEAR;
+    long int lCurrentTime               = DEF_CLEAR;
+    ERROR_TYPE eRetVal                  = NO_ERROR;
+
     lCurrentTime = clock();
 
     if(lCurrentTime == DEF_CLEAR)
     {
-        return ERROR_INVALID;
+        eRetVal = ERROR_INVALID;
     }
     else
     {
@@ -181,7 +185,7 @@ ERROR_TYPE CheckPollTime(long int lCheckTime)
     if(lPreviousCheckTime == DEF_CLEAR)
     {
         lPreviousCheckTime = lCurrentTime;
-        return NO_ERROR;
+        eRetVal = NO_ERROR;
     }
     else
     {
@@ -189,10 +193,10 @@ ERROR_TYPE CheckPollTime(long int lCheckTime)
     }
     if((lCurrentTime - lPreviousCheckTime) < lCheckTime)
     {
-        return ERROR_INVALID;
+        eRetVal = ERROR_INVALID;
     }
     lPreviousCheckTime = lCurrentTime;
-    return NO_ERROR;
+    return eRetVal;
 }
 
 //******************************* CheckOperatingRange **************************
@@ -206,16 +210,18 @@ ERROR_TYPE CheckPollTime(long int lCheckTime)
 //******************************************************************************
 ERROR_TYPE CheckOperatingRange(PRESSURE_CONFIG *pstPressureConfig,int iReadVal)
 {
+    ERROR_TYPE eRetVal = NO_ERROR;
+
     if(iReadVal < pstPressureConfig->iLowerOperatingRange ||
        iReadVal > pstPressureConfig->iUpperOperatingRange)
     {
-        return ERROR_INVALID;
+        eRetVal = ERROR_INVALID;
     }
     else
     {
         /* No Process*/
     }
-    return NO_ERROR;
+    return eRetVal;
 }
 
 //******************************* CheckThresholdRange **************************
@@ -229,19 +235,21 @@ ERROR_TYPE CheckOperatingRange(PRESSURE_CONFIG *pstPressureConfig,int iReadVal)
 //******************************************************************************
 ERROR_TYPE CheckThresholdRange(PRESSURE_CONFIG *pstPressureConfig,int iReadVal)
 {
+    ERROR_TYPE eRetVal = NO_ERROR;
+
     if(iReadVal < pstPressureConfig->iLowerThresholdRange)
     {
-        return ERROR_THRESHOLD_MIN;
+        eRetVal = ERROR_THRESHOLD_MIN;
     }
     else if(iReadVal > pstPressureConfig->iUpperThresholdRange)
     {
-        return ERROR_THRESHOLD_MAX;
+        eRetVal = ERROR_THRESHOLD_MAX;
     }
     else
     {
         /* No Process*/
     }
-    return NO_ERROR;
+    return eRetVal;
 }
 
 //******************************* ProcessData **********************************
@@ -257,7 +265,7 @@ ERROR_TYPE ProcessData(PRESSURE_CONFIG *pstPressureConfig)
     int iReadVal = DEF_CLEAR;
     ERROR_TYPE eRetVal = NO_ERROR;
 
-    eRetVal = ReadPressure(&iReadVal);
+    eRetVal = ReadPressure(&iReadVal, pstPressureConfig);
     if(eRetVal != NO_ERROR)
     {
         return eRetVal;
@@ -304,11 +312,10 @@ ERROR_TYPE FaultHandler(PRESSURE_CONFIG *pstPressureConfig)
     for(iTryCount = 0; iTryCount < pstPressureConfig->iMaxTryCount; iTryCount++)
     {
 
-        eRetVal = ReadPressure(&iReadVal);
+        eRetVal = ReadPressure(&iReadVal, pstPressureConfig);
         if(eRetVal != NO_ERROR)
         {
             PrintMessage(ERROR_INVALID, iReadVal);
-            continue;
         }
         else
         {
@@ -318,16 +325,17 @@ ERROR_TYPE FaultHandler(PRESSURE_CONFIG *pstPressureConfig)
         if(CheckOperatingRange(pstPressureConfig, iReadVal) == NO_ERROR)
         {
             PrintMessage(NO_ERROR, iReadVal);
-            return NO_ERROR;
+            eRetVal = NO_ERROR;
+            break;
         }
         else
         {
-            continue;
+            /* No Process*/
         }
         usleep(pstPressureConfig->liRetrytimeout);
         
     }
-    return ERROR_INVALID;
+    return eRetVal;
 }
 
 //******************************* SafeProcessing *******************************

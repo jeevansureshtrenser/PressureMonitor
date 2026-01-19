@@ -29,6 +29,6 @@
 //****************************** Global Variables ******************************
 
 //******************************* Forward Declaration***************************
-extern ERROR_TYPE ReadPressure(int*);
+extern ERROR_TYPE ReadPressure(int*, PRESSURE_CONFIG *);
 
 #endif /*__PRESSURE_SENSOR_H__*/
