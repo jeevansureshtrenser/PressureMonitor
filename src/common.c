@@ -318,7 +318,7 @@ ERROR_TYPE FaultHandler(PRESSURE_CONFIG *pstPressureConfig)
         if(CheckOperatingRange(pstPressureConfig, iReadVal) == NO_ERROR)
         {
             PrintMessage(NO_ERROR, iReadVal);
-            //return NO_ERROR;
+            return NO_ERROR;
         }
         else
         {
